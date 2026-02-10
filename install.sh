@@ -20,10 +20,13 @@ mkdir -p "$HOOKS_DIR" "$SOUNDS_DIR"
 cp "$SCRIPT_DIR/router.py"       "$HOOKS_DIR/"
 cp "$SCRIPT_DIR/classify.py"     "$HOOKS_DIR/"
 cp "$SCRIPT_DIR/notify.py"       "$HOOKS_DIR/"
-cp "$SCRIPT_DIR/priorities.toml" "$HOOKS_DIR/"
 
-# Patch notify.py to use ~/.claude/sounds/ (installed location)
-sed -i '' 's|os.path.join(os.path.dirname(os.path.abspath(__file__)), "sounds")|os.path.expanduser("~/.claude/sounds")|' "$HOOKS_DIR/notify.py"
+# Copy config only if it doesn't exist (don't overwrite customizations)
+if [ ! -f "$HOOKS_DIR/priorities.toml" ]; then
+    cp "$SCRIPT_DIR/priorities.toml" "$HOOKS_DIR/"
+else
+    echo "  priorities.toml already exists — skipping (won't overwrite your config)"
+fi
 
 # Copy sounds
 cp "$SCRIPT_DIR/sounds/"*.wav "$SOUNDS_DIR/"
