@@ -1,0 +1,62 @@
+# Agentic Attention System — Priority Configuration
+#
+# Controls how Claude Code hook events route to sounds, symbols,
+# and tab titles. Edit patterns and symbols to tune what gets
+# your attention while working alongside an AI agent.
+#
+# Patterns are regex (case-insensitive), matched against Claude's
+# last assistant message. Tiers checked top-to-bottom: first match wins.
+
+[project]
+# Regex applied to file paths in the session transcript.
+# First capture group = project name shown in the tab.
+# Set this to match your directory structure:
+#   'projects/([^/]+)/'      — projects/my-app/ → "my-app"
+#   'packages/([^/]+)/'      — monorepo packages
+#   'clients/([^/]+)/'       — client work folders
+#   'Work/([^/]+)/'          — Obsidian vault with Work/ClientName/ folders
+#   'src/([^/]+)/'           — flat src directory per module
+path_pattern = 'projects/([^/]+)/'
+fallback = "internal"
+
+[states]
+# Symbols for non-classified events (session lifecycle, not content)
+starting   = "↻"
+working    = "↻"
+permission = "⏸"
+waiting    = "⏳"
+
+[critical]
+sound   = "error.wav"
+symbol  = "⚠"
+patterns = [
+    'should I ',
+    'do you (want|prefer|need)',
+    'which (approach|option|one)',
+    'please (confirm|verify|check)',
+    'need your (input|decision|approval)',
+    'permission denied',
+    'fatal error',
+    'unable to (proceed|continue)',
+    'could not (find|resolve|connect)',
+    "I'm (stuck|blocked|unable)",
+    'I need you to',
+]
+
+[complete]
+sound   = "task_complete.wav"
+symbol  = "✓"
+patterns = [
+    "I've (created|updated|written|built|implemented|added|fixed)",
+    'successfully',
+    'completed|finished',
+    "here's (the|a) summary",
+    'let me know if',
+    'changes have been (made|applied|committed)',
+    'all (tests|checks) pass',
+]
+
+[update]
+sound   = ""
+symbol  = "·"
+patterns = []
