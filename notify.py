@@ -9,8 +9,12 @@ import subprocess
 import os
 
 
-# Sounds live in the sounds/ directory next to this file
-SOUNDS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sounds")
+# Default: ~/.claude/sounds/ (standard install location)
+# Override with AGENTIC_ATTENTION_SOUNDS env var if needed
+SOUNDS_DIR = os.environ.get(
+    "AGENTIC_ATTENTION_SOUNDS",
+    os.path.expanduser("~/.claude/sounds"),
+)
 
 
 def play_sound(filename: str) -> None:
