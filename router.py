@@ -94,28 +94,32 @@ def handle_stop(event: dict, config: dict) -> None:
     else:
         detail = "idle"
 
-    # Mark as unseen — the user hasn't acknowledged this yet
-    write_state(transcript_path, tier, project, detail)
+    # Only mark critical/complete as unseen — update tier is low urgency
+    unseen = tier in ("critical", "complete")
+    if unseen:
+        write_state(transcript_path, tier, project, detail)
 
     play_sound(tier_config.get("sound", ""))
-    tab(project, symbol, detail, unseen=True)
+    tab(project, symbol, detail, unseen=unseen)
 
 
 def handle_notification(event: dict, config: dict) -> None:
     """Route system notifications — distinguish urgent from informational."""
     project = resolve_project(event, config)
+    transcript_path = event.get("transcript_path", "")
     notification_type = event.get("notification_type", "")
     states = config.get("states", {})
 
     if notification_type == "permission_prompt":
+        write_state(transcript_path, "critical", project, "approve?")
         play_sound(config.get("critical", {}).get("sound", "error.wav"))
-        tab(project, states.get("permission", "⏸"), "approve?")
+        tab(project, states.get("permission", "⏸"), "approve?", unseen=True)
         return
 
     if notification_type == "idle_prompt":
         # Idle = Claude finished, your turn. Not urgent — no sound.
-        # The Stop handler already played the completion sound.
-        tab(project, states.get("idle", "✓"), "ready")
+        # The Stop handler already wrote state and played the completion sound.
+        tab(project, states.get("idle", "✓"), "ready", unseen=True)
         return
 
     # All other notifications — silent, keep working state
