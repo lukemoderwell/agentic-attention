@@ -67,6 +67,10 @@ def handle_session_start(event: dict, config: dict) -> None:
 
 
 def handle_user_prompt(event: dict, config: dict) -> None:
+    # User is typing → they've seen the tab. Acknowledge any pending notification.
+    transcript_path = event.get("transcript_path", "")
+    mark_seen(transcript_path)
+
     project = resolve_project(event, config)
     states = config.get("states", {})
     tab(project, states.get("working", "↻"), "working")
@@ -90,8 +94,11 @@ def handle_stop(event: dict, config: dict) -> None:
     else:
         detail = "idle"
 
+    # Mark as unseen — the user hasn't acknowledged this yet
+    write_state(transcript_path, tier, project, detail)
+
     play_sound(tier_config.get("sound", ""))
-    tab(project, symbol, detail)
+    tab(project, symbol, detail, unseen=True)
 
 
 def handle_notification(event: dict, config: dict) -> None:
