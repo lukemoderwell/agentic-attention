@@ -25,6 +25,7 @@ starting   = "↻"
 working    = "↻"
 permission = "⏸"
 waiting    = "⏳"
+idle       = "✓"
 
 [critical]
 sound   = "error.wav"

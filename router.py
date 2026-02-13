@@ -90,7 +90,7 @@ def handle_stop(event: dict, config: dict) -> None:
 
 
 def handle_notification(event: dict, config: dict) -> None:
-    """Route system notifications — permission/idle are always critical."""
+    """Route system notifications — distinguish urgent from informational."""
     project = resolve_project(event, config)
     notification_type = event.get("notification_type", "")
     states = config.get("states", {})
@@ -101,8 +101,9 @@ def handle_notification(event: dict, config: dict) -> None:
         return
 
     if notification_type == "idle_prompt":
-        play_sound(config.get("critical", {}).get("sound", "error.wav"))
-        tab(project, states.get("waiting", "⏳"), "waiting")
+        # Idle = Claude finished, your turn. Not urgent — no sound.
+        # The Stop handler already played the completion sound.
+        tab(project, states.get("idle", "✓"), "ready")
         return
 
     # All other notifications — silent, keep working state
