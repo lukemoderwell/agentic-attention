@@ -24,6 +24,7 @@ from classify import (
     detect_project,
 )
 from notify import set_tab_title, play_sound
+from state import write_state, mark_seen, clear_state
 
 
 # ── Project resolution ──────────────────────────────────────────────
@@ -48,15 +49,19 @@ def resolve_project(event: dict, config: dict) -> str:
 # ── Tab title ────────────────────────────────────────────────────────
 
 
-def tab(project: str, symbol: str, detail: str) -> None:
-    """Set terminal tab title as 'project symbol detail'."""
-    set_tab_title(f"{project} {symbol} {detail}")
+def tab(project: str, symbol: str, detail: str, unseen: bool = False) -> None:
+    """Set terminal tab title as 'project symbol detail', with unseen marker."""
+    title = f"{project} {symbol} {detail}"
+    if unseen:
+        title = f"🟡 {title}"
+    set_tab_title(title)
 
 
 # ── Hook handlers ────────────────────────────────────────────────────
 
 
 def handle_session_start(event: dict, config: dict) -> None:
+    clear_state(event.get("transcript_path", ""))
     states = config.get("states", {})
     tab(cwd_label(event), states.get("starting", "↻"), "starting")
 
