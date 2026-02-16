@@ -30,6 +30,7 @@ idle       = "✓"
 [critical]
 sound   = "error.wav"
 symbol  = "⚠"
+unseen_marker = "🟡"
 patterns = [
     'should I ',
     'do you (want|prefer|need)',
@@ -47,6 +48,7 @@ patterns = [
 [complete]
 sound   = "task_complete.wav"
 symbol  = "✓"
+unseen_marker = "🟢"
 patterns = [
     "I've (created|updated|written|built|implemented|added|fixed)",
     'successfully',

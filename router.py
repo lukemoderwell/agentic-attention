@@ -49,11 +49,11 @@ def resolve_project(event: dict, config: dict) -> str:
 # ── Tab title ────────────────────────────────────────────────────────
 
 
-def tab(project: str, symbol: str, detail: str, unseen: bool = False) -> None:
-    """Set terminal tab title as 'project symbol detail', with unseen marker."""
+def tab(project: str, symbol: str, detail: str, marker: str = "") -> None:
+    """Set terminal tab title as 'project symbol detail', with optional unseen marker."""
     title = f"{project} {symbol} {detail}"
-    if unseen:
-        title = f"🟡 {title}"
+    if marker:
+        title = f"{marker} {title}"
     set_tab_title(title)
 
 
@@ -94,13 +94,12 @@ def handle_stop(event: dict, config: dict) -> None:
     else:
         detail = "idle"
 
-    # Only mark critical/complete as unseen — update tier is low urgency
-    unseen = tier in ("critical", "complete")
-    if unseen:
+    marker = tier_config.get("unseen_marker", "")
+    if marker:
         write_state(transcript_path, tier, project, detail)
 
     play_sound(tier_config.get("sound", ""))
-    tab(project, symbol, detail, unseen=unseen)
+    tab(project, symbol, detail, marker=marker)
 
 
 def handle_notification(event: dict, config: dict) -> None:
@@ -111,15 +110,17 @@ def handle_notification(event: dict, config: dict) -> None:
     states = config.get("states", {})
 
     if notification_type == "permission_prompt":
+        critical_config = config.get("critical", {})
         write_state(transcript_path, "critical", project, "approve?")
-        play_sound(config.get("critical", {}).get("sound", "error.wav"))
-        tab(project, states.get("permission", "⏸"), "approve?", unseen=True)
+        play_sound(critical_config.get("sound", "error.wav"))
+        tab(project, states.get("permission", "⏸"), "approve?", marker=critical_config.get("unseen_marker", "🟡"))
         return
 
     if notification_type == "idle_prompt":
         # Idle = Claude finished, your turn. Not urgent — no sound.
         # The Stop handler already wrote state and played the completion sound.
-        tab(project, states.get("idle", "✓"), "ready", unseen=True)
+        complete_marker = config.get("complete", {}).get("unseen_marker", "🟢")
+        tab(project, states.get("idle", "✓"), "ready", marker=complete_marker)
         return
 
     # All other notifications — silent, keep working state
