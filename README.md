@@ -53,6 +53,19 @@ Every Claude Code hook event routes through a single Python entry point (`router
               │ - afplay   │  sound
               │ - TTY esc  │  tab title
               └───────────┘
+
+┌─────────────────────────────────────────────────┐
+│  Claude Code Statusline                         │
+│  (JSON via stdin after each response)           │
+└────────────────────┬────────────────────────────┘
+                     │
+                     ▼
+            ┌────────────────┐
+            │ statusline.sh  │
+            │ - context %    │  fuel gauge
+            │ - session cost │  $ display
+            │ - model name   │  label
+            └────────────────┘
 ```
 
 ## Install
@@ -65,7 +78,7 @@ cd agentic-attention
 ./install.sh
 ```
 
-The install script copies files to `~/.claude/hooks/` and `~/.claude/sounds/`, then prints the hooks JSON to add to your `~/.claude/settings.json`.
+The install script copies files to `~/.claude/hooks/`, `~/.claude/sounds/`, and `~/.claude/statusline.sh`, then prints the JSON to add to your `~/.claude/settings.json`.
 
 ### Configure your project pattern
 
@@ -82,9 +95,25 @@ fallback = "internal"
 
 The regex runs against raw file paths in the session transcript. When Claude reads or edits `packages/my-app/src/index.ts`, the tab shows `my-app` instead of a generic label.
 
+## Statusline
+
+A context-aware fuel gauge that sits in the Claude Code status bar alongside built-in git changes.
+
+```
+▓▓▓▓▓▓▓░░░ 72% ctx  $0.69  Opus 4.6
+```
+
+Shows three things at a glance:
+
+- **Context remaining** — visual bar that drains as the conversation grows, color-coded green → yellow → red
+- **Session cost** — equivalent API cost (informational, not billed separately on Pro)
+- **Model name** — which model is active
+
+The script reads JSON piped from Claude Code via stdin — no API tokens consumed. It updates after every assistant response.
+
 ## Configuration
 
-All behavior is controlled by `priorities.toml`:
+All hook behavior is controlled by `priorities.toml`:
 
 ### Priority tiers
 
