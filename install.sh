@@ -28,6 +28,10 @@ else
     echo "  priorities.toml already exists — skipping (won't overwrite your config)"
 fi
 
+# Copy statusline
+cp "$SCRIPT_DIR/statusline.sh" "$HOME/.claude/statusline.sh"
+chmod +x "$HOME/.claude/statusline.sh"
+
 # Copy sounds
 cp "$SCRIPT_DIR/sounds/"*.wav "$SOUNDS_DIR/"
 cp "$SCRIPT_DIR/sounds/generate.py" "$SOUNDS_DIR/"
@@ -37,6 +41,7 @@ echo "  $HOOKS_DIR/router.py"
 echo "  $HOOKS_DIR/classify.py"
 echo "  $HOOKS_DIR/notify.py"
 echo "  $HOOKS_DIR/priorities.toml"
+echo "  $HOME/.claude/statusline.sh"
 echo "  $SOUNDS_DIR/*.wav"
 echo ""
 echo "Now add the hooks to your ~/.claude/settings.json."
@@ -44,6 +49,11 @@ echo "If you already have a \"hooks\" key, merge these entries:"
 echo ""
 cat <<'SETTINGS'
 {
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "padding": 2
+  },
   "hooks": {
     "Stop": [
       {
